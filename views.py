@@ -38,6 +38,24 @@ def _s(x) -> str:
     return str(x)
 
 
+_KP_STATUSES = ["—", "✅ Correct", "❌ Wrong", "○ Not covered"]
+
+
+def _key_point_checklist(key_prefix: str, key_points: list) -> None:
+    """Render key points as a checklist with correct / wrong / not-covered radio buttons."""
+    for i, kp in enumerate(key_points):
+        c_text, c_radio = st.columns([3, 2])
+        c_text.markdown(kp)
+        c_radio.radio(
+            f"kp_{i}",
+            _KP_STATUSES,
+            index=0,
+            key=f"{key_prefix}_kp_{i}",
+            horizontal=True,
+            label_visibility="collapsed",
+        )
+
+
 def _score_select(label_prefix: str, crit: dict, default: int | None):
     """A 0..3 selectbox for one criterion, with score labels shown inline."""
     anchors = crit["anchors"]
@@ -122,8 +140,7 @@ def page_add(store: EvalStore):
     kp_key = "expected_key_points_de" if language == "de" else "expected_key_points"
     st.markdown(f"> {prompt[text_key].strip()}")
     with st.expander("Answer anchor (key points a strong answer should contain)"):
-        for kp in prompt.get(kp_key, []):
-            st.markdown(f"- {kp}")
+        _key_point_checklist(f"{pid}_{language}", prompt.get(kp_key, []))
 
     # --- the scored entry --------------------------------------------------
     with st.form("add_form", clear_on_submit=False):
@@ -227,8 +244,7 @@ def page_review(store: EvalStore):
     if prompt:
         kp_key = "expected_key_points_de" if row_lang == "de" else "expected_key_points"
         with st.expander("Answer anchor"):
-            for kp in prompt.get(kp_key, []):
-                st.markdown(f"- {kp}")
+            _key_point_checklist(f"rev_{eid}", prompt.get(kp_key, []))
 
     st.subheader("Model output")
     st.text_area("Model output", value=_s(row.get("llm_output")), height=220, disabled=True,
