@@ -1,0 +1,109 @@
+# Transplantation-medicine evaluation prompts.
+# These are a starting set spanning subdomains and cognitive levels.
+# As the domain owner, edit freely: change wording, add/remove prompts,
+# and refine `expected_key_points` (shown to raters as an answer anchor).
+#
+# Fields:
+#   id                 stable identifier (do NOT reuse an id for a new question)
+#   domain             subdomain, used for grouping in results
+#   cognitive_level    recall | completeness | reasoning | application | nuance
+#   text               the exact prompt sent to every model
+#   expected_key_points  bullet anchors of a strong answer (rater reference)
+
+- id: P01_rejection_types
+  domain: Immunology / rejection
+  cognitive_level: reasoning
+  text: >
+    Explain the difference between hyperacute, acute, and chronic rejection in
+    solid organ transplantation, including the immunological mechanisms and the
+    typical time course of each.
+  expected_key_points:
+    - "Hyperacute: preformed donor-specific antibodies, complement activation, minutes-hours, now rare due to crossmatching."
+    - "Acute: T-cell-mediated (cellular) and/or antibody-mediated (humoral); days to months; treatable."
+    - "Chronic: multifactorial, immune + non-immune, months-years; fibrosis/vasculopathy; largely irreversible."
+    - "Correct mechanism-to-timeframe mapping; mentions diagnosis (biopsy/Banff) is a plus."
+
+- id: P02_tac_clarithromycin
+  domain: Pharmacology / drug interaction
+  cognitive_level: application
+  text: >
+    A kidney transplant recipient stable on tacrolimus is started on a course of
+    clarithromycin for a respiratory infection. What is the clinically important
+    interaction, what is the mechanism, and how should it be managed?
+  expected_key_points:
+    - "Clarithromycin is a strong CYP3A4 (and P-gp) inhibitor; tacrolimus is a CYP3A4 substrate."
+    - "Result: tacrolimus levels RISE -> nephrotoxicity / over-immunosuppression risk. (Direction matters; reversing it is dangerous.)"
+    - "Management: avoid/choose alternative antibiotic (e.g. azithromycin), or pre-emptively reduce tacrolimus dose and monitor trough levels closely."
+    - "Flag as potentially harmful if it states levels fall or advises increasing the dose."
+
+- id: P03_ch_kidney_allocation
+  domain: Allocation policy (Switzerland)
+  cognitive_level: recall
+  text: >
+    Describe how deceased-donor kidneys are allocated in Switzerland under the
+    current national allocation system. Which factors determine priority?
+  expected_key_points:
+    - "National system administered via Swisstransplant (SOAS)."
+    - "Factors: blood group, HLA match/mismatch, waiting time, highly sensitised (cPRA) priority, age matching, paediatric priority, medical urgency."
+    - "Region-specific detail rewards models that genuinely know the Swiss system; good discriminator."
+
+- id: P04_dbd_donor_management
+  domain: Donor management
+  cognitive_level: completeness
+  text: >
+    List the essential components of donor management for a brain-dead (DBD)
+    potential multi-organ donor in the ICU, aimed at optimising organ viability.
+  expected_key_points:
+    - "Haemodynamic support / euvolaemia; vasopressors; treat diabetes insipidus (desmopressin)."
+    - "Hormonal resuscitation (vasopressin, thyroid hormone, corticosteroids)."
+    - "Lung-protective ventilation; temperature, electrolyte, glucose control."
+    - "Coagulation management; infection surveillance; serology/typing for matching."
+
+- id: P05_hla_sensitisation
+  domain: Immunology / matching
+  cognitive_level: reasoning
+  text: >
+    Explain how HLA sensitisation occurs, how it is detected (e.g. PRA/cPRA and
+    donor-specific antibodies), and why it affects both access to transplantation
+    and post-transplant outcomes.
+  expected_key_points:
+    - "Sensitising events: transfusion, pregnancy, prior transplant."
+    - "Detection: PRA/cPRA, single-antigen bead (Luminex) for DSA, virtual and physical crossmatch."
+    - "Consequences: longer waiting time, fewer compatible donors, higher AMR and graft loss risk."
+    - "Connects mechanism -> testing -> clinical consequence."
+
+- id: P06_machine_perfusion_liver
+  domain: Preservation / perfusion
+  cognitive_level: nuance
+  text: >
+    Compare static cold storage with normothermic machine perfusion for liver
+    transplantation. What are the proposed benefits, and what does current
+    evidence suggest about outcomes?
+  expected_key_points:
+    - "SCS: simple, cheap, standard; limits ischaemic time, no viability assessment."
+    - "NMP: maintains metabolism at physiological temperature, enables viability testing, may reduce early allograft dysfunction and enable use of marginal/DCD grafts."
+    - "Evidence nuance (e.g. reduced graft injury, expanded donor pool); rewards recency and avoids overclaiming."
+
+- id: P07_kidney_dysfunction_case
+  domain: Clinical reasoning
+  cognitive_level: application
+  text: >
+    A kidney transplant recipient presents 3 months post-transplant with rising
+    creatinine, low-grade fever and reduced urine output. Outline your
+    differential diagnosis and initial diagnostic approach.
+  expected_key_points:
+    - "Differential: acute rejection (cellular/AMR), infection (BK nephropathy, CMV, UTI/pyelonephritis), CNI toxicity, obstruction/urological, dehydration/pre-renal, recurrence."
+    - "Work-up: bloods incl. tacrolimus trough, urinalysis/culture, BK & CMV viral load, ultrasound +/- Doppler, then allograft biopsy."
+    - "Sensible prioritisation reflecting the 3-month timeframe."
+
+- id: P08_consent_models
+  domain: Ethics / law (Switzerland)
+  cognitive_level: nuance
+  text: >
+    Explain the difference between opt-in (explicit consent) and opt-out
+    (presumed consent) organ-donation models, and summarise the recent change to
+    Switzerland's consent model.
+  expected_key_points:
+    - "Opt-in: donation only with explicit prior consent. Opt-out/presumed: donor unless one objected in life."
+    - "Switzerland: 2022 referendum (~60% in favour) approved the 'extended' opt-out model; relatives retain a say."
+    - "Implementation requires a national register/ordinances and was deferred (not immediate). Reward accurate nuance over confident wrong dates."

@@ -1,0 +1,12 @@
+# Secrets — never commit
+.streamlit/secrets.toml
+*service-account*.json
+*.credentials.json
+
+# Local data / scratch
+evaluations.xlsx
+*.sqlite
+__pycache__/
+*.pyc
+.venv/
+_*.py
