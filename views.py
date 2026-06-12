@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import functools
 import io
+import json
 
 import pandas as pd
 import streamlit as st
@@ -41,7 +42,7 @@ def _s(x) -> str:
 _KP_STATUSES = ["✅ Correct", "❌ Wrong", "○ Not covered"]
 
 
-def _key_point_checklist(key_prefix: str, key_points: list) -> None:
+def _key_point_checklist(key_prefix: str, key_points: list, defaults: list | None = None) -> None:
     """Render key points as a table with one row per statement and 3 rating options."""
     if not key_points:
         return
@@ -53,10 +54,12 @@ def _key_point_checklist(key_prefix: str, key_points: list) -> None:
         st.divider()
         c_text, c_radio = st.columns([5, 3])
         c_text.markdown(kp)
+        stored = defaults[i] if (defaults and i < len(defaults)) else None
+        idx = _KP_STATUSES.index(stored) if stored in _KP_STATUSES else None
         c_radio.radio(
             f"kp_{i}",
             _KP_STATUSES,
-            index=None,
+            index=idx,
             key=f"{key_prefix}_kp_{i}",
             horizontal=True,
             label_visibility="collapsed",
@@ -197,6 +200,11 @@ def page_add(store: EvalStore):
             st.error("Please provide: " + ", ".join(problems) + ".")
             return
 
+        kp_answers = [
+            st.session_state.get(f"{pid}_{language}_kp_{i}")
+            for i in range(len(prompt.get(kp_key, [])))
+        ]
+
         rec = blank_record()
         rec.update(
             eval_id=new_eval_id(),
@@ -217,6 +225,7 @@ def page_add(store: EvalStore):
             evaluator_name=evaluator_name.strip(),
             ev_safety=safety,
             ev_comment=comment.strip(),
+            ev_kp_answers=json.dumps(kp_answers),
             status=C.STATUS_PENDING,
         )
         for k in C.CRITERIA_KEYS:
@@ -247,8 +256,9 @@ def page_review(store: EvalStore):
 
     def _lbl(r):
         ver = f" ({r['model_version']})" if str(r.get("model_version") or "").strip() not in ("", "nan") else ""
+        lang = C.LANGUAGES.get(r.get("language") or C.LANGUAGE_DEFAULT, (r.get("language") or C.LANGUAGE_DEFAULT).upper())
         tag = "🟡" if r["status"] == C.STATUS_PENDING else "✅"
-        return f"{tag} {r['model_name']}{ver} · {r['prompt_id']}"
+        return f"{tag} {r['model_name']}{ver} · {r['prompt_id']} [{lang}]"
 
     options = {_lbl(r): r["eval_id"] for r in view.to_dict("records")}
     pick = st.selectbox("Evaluation", list(options.keys()))
@@ -279,7 +289,14 @@ def page_review(store: EvalStore):
     prompt = prompt_by_id(row["prompt_id"])
     if prompt:
         kp_key = "expected_key_points_de" if row_lang == "de" else "expected_key_points"
-        _key_point_checklist(f"rev_{eid}", prompt.get(kp_key, []))
+        ev_kp_defaults = None
+        raw = _s(row.get("ev_kp_answers"))
+        if raw:
+            try:
+                ev_kp_defaults = json.loads(raw)
+            except Exception:
+                pass
+        _key_point_checklist(f"rev_{eid}", prompt.get(kp_key, []), defaults=ev_kp_defaults)
 
     # evaluator's scores for reference
     ev_pretty = ", ".join(

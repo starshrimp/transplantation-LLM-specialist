@@ -157,7 +157,7 @@ EVAL_COLUMNS = (
         "evaluator_name",
     ]
     + _criteria_cols("ev")        # ev_factual, ev_completeness, ...
-    + ["ev_safety", "ev_comment", "status", "reviewer_name"]
+    + ["ev_safety", "ev_comment", "ev_kp_answers", "status", "reviewer_name"]
     + _criteria_cols("rv")        # rv_factual, ... (reviewer / verified values)
     + ["rv_safety", "rv_comment", "timestamp_verified"]
 )
