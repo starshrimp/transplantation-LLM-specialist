@@ -7,8 +7,10 @@
 #   id                 stable identifier (do NOT reuse an id for a new question)
 #   domain             subdomain, used for grouping in results
 #   cognitive_level    recall | completeness | reasoning | application | nuance
-#   text               the exact prompt sent to every model
-#   expected_key_points  bullet anchors of a strong answer (rater reference)
+#   text               the exact prompt sent to every model (English)
+#   text_de            German translation of the prompt
+#   expected_key_points      bullet anchors of a strong answer (English, rater reference)
+#   expected_key_points_de   German equivalents of the key-point anchors
 
 - id: P01_rejection_types
   domain: Immunology / rejection
@@ -22,6 +24,15 @@
     - "Acute: T-cell-mediated (cellular) and/or antibody-mediated (humoral); days to months; treatable."
     - "Chronic: multifactorial, immune + non-immune, months-years; fibrosis/vasculopathy; largely irreversible."
     - "Correct mechanism-to-timeframe mapping; mentions diagnosis (biopsy/Banff) is a plus."
+  text_de: >
+    Erläutern Sie den Unterschied zwischen hyperakuter, akuter und chronischer Abstossung
+    bei der Organtransplantation, einschliesslich der immunologischen Mechanismen und des
+    typischen zeitlichen Verlaufs jeder Form.
+  expected_key_points_de:
+    - "Hyperakut: präformierte donorspezifische Antikörper, Komplementaktivierung, Minuten bis Stunden, heute selten dank Kreuzprobe."
+    - "Akut: T-Zell-vermittelt (zellulär) und/oder antikörpervermittelt (humoral); Tage bis Monate; behandelbar."
+    - "Chronisch: multifaktoriell, immunologisch und nicht-immunologisch, Monate bis Jahre; Fibrose/Vaskulopathie; weitgehend irreversibel."
+    - "Korrekte Mechanismus-Zeitrahmen-Zuordnung; Erwähnung der Diagnose (Biopsie/Banff) ist ein Plus."
 
 - id: P02_tac_clarithromycin
   domain: Pharmacology / drug interaction
@@ -35,6 +46,15 @@
     - "Result: tacrolimus levels RISE -> nephrotoxicity / over-immunosuppression risk. (Direction matters; reversing it is dangerous.)"
     - "Management: avoid/choose alternative antibiotic (e.g. azithromycin), or pre-emptively reduce tacrolimus dose and monitor trough levels closely."
     - "Flag as potentially harmful if it states levels fall or advises increasing the dose."
+  text_de: >
+    Eine nierentransplantierte Patientin unter stabiler Tacrolimus-Therapie erhält
+    Clarithromycin wegen einer Atemwegsinfektion. Was ist die klinisch relevante
+    Wechselwirkung, was ist der Mechanismus, und wie sollte sie gemanagt werden?
+  expected_key_points_de:
+    - "Clarithromycin ist ein starker CYP3A4- (und P-gp-)Inhibitor; Tacrolimus ist ein CYP3A4-Substrat."
+    - "Folge: Tacrolimus-Spiegel STEIGEN → Nephrotoxizitäts-/Überimmunsuppressionsgefahr. (Richtung entscheidend; Umkehrung ist gefährlich.)"
+    - "Management: Antibiotikum möglichst vermeiden/Alternative wählen (z.B. Azithromycin) oder Tacrolimus-Dosis prophylaktisch reduzieren und Talspiegel engmaschig überwachen."
+    - "Als potenziell gefährlich einstufen, wenn angegeben wird, dass der Spiegel sinkt oder eine Dosiserhöhung empfohlen wird."
 
 - id: P03_ch_kidney_allocation
   domain: Allocation policy (Switzerland)
@@ -46,6 +66,13 @@
     - "National system administered via Swisstransplant (SOAS)."
     - "Factors: blood group, HLA match/mismatch, waiting time, highly sensitised (cPRA) priority, age matching, paediatric priority, medical urgency."
     - "Region-specific detail rewards models that genuinely know the Swiss system; good discriminator."
+  text_de: >
+    Beschreiben Sie, wie verstorbene Spendernieren in der Schweiz im Rahmen des aktuellen
+    nationalen Zuteilungssystems zugeteilt werden. Welche Faktoren bestimmen die Priorität?
+  expected_key_points_de:
+    - "Nationales System, betrieben durch Swisstransplant (SOAS)."
+    - "Faktoren: Blutgruppe, HLA-Übereinstimmung/-Mismatch, Wartezeit, Priorität für hochsensibilisierte Patienten (cPRA), Altersabgleich, pädiatrische Priorität, medizinische Dringlichkeit."
+    - "Regionsspezifische Kenntnisse des Schweizer Systems werden belohnt; guter Diskriminator."
 
 - id: P04_dbd_donor_management
   domain: Donor management
@@ -58,6 +85,15 @@
     - "Hormonal resuscitation (vasopressin, thyroid hormone, corticosteroids)."
     - "Lung-protective ventilation; temperature, electrolyte, glucose control."
     - "Coagulation management; infection surveillance; serology/typing for matching."
+  text_de: >
+    Nennen Sie die wesentlichen Massnahmen des Spendermanagements für einen hirntoten (DBD)
+    potenziellen Multiorgan-Spender auf der Intensivstation zur Optimierung der
+    Organvitalität.
+  expected_key_points_de:
+    - "Hämodynamische Stabilisierung/Euvolämie; Vasopressoren; Behandlung des Diabetes insipidus (Desmopressin)."
+    - "Hormonelle Resuszitation (Vasopressin, Schilddrüsenhormon, Kortikosteroide)."
+    - "Lungenprotektive Beatmung; Temperatur-, Elektrolyt- und Glukosekontrolle."
+    - "Gerinnungsmanagement; Infektionsüberwachung; Serologie/Typisierung für das Matching."
 
 - id: P05_hla_sensitisation
   domain: Immunology / matching
@@ -71,6 +107,15 @@
     - "Detection: PRA/cPRA, single-antigen bead (Luminex) for DSA, virtual and physical crossmatch."
     - "Consequences: longer waiting time, fewer compatible donors, higher AMR and graft loss risk."
     - "Connects mechanism -> testing -> clinical consequence."
+  text_de: >
+    Erklären Sie, wie eine HLA-Sensibilisierung entsteht, wie sie nachgewiesen wird
+    (z.B. PRA/cPRA und donorspezifische Antikörper), und warum sie sowohl den Zugang zur
+    Transplantation als auch die Ergebnisse nach der Transplantation beeinflusst.
+  expected_key_points_de:
+    - "Sensibilisierende Ereignisse: Bluttransfusion, Schwangerschaft, Vortransplantation."
+    - "Nachweis: PRA/cPRA, Single-Antigen-Bead (Luminex) für DSA, virtueller und physischer Kreuztest."
+    - "Konsequenzen: längere Wartezeit, weniger kompatible Spender, erhöhtes AMR- und Transplantatverlustrisiko."
+    - "Verknüpft Mechanismus → Diagnostik → klinische Konsequenz."
 
 - id: P06_machine_perfusion_liver
   domain: Preservation / perfusion
@@ -83,6 +128,14 @@
     - "SCS: simple, cheap, standard; limits ischaemic time, no viability assessment."
     - "NMP: maintains metabolism at physiological temperature, enables viability testing, may reduce early allograft dysfunction and enable use of marginal/DCD grafts."
     - "Evidence nuance (e.g. reduced graft injury, expanded donor pool); rewards recency and avoids overclaiming."
+  text_de: >
+    Vergleichen Sie die statische Kaltlagerung mit der normothermen maschinellen Perfusion
+    für die Lebertransplantation. Was sind die postulierten Vorteile, und was legt die
+    aktuelle Evidenz bezüglich der Ergebnisse nahe?
+  expected_key_points_de:
+    - "SKL: einfach, günstig, Standardverfahren; begrenzt Ischämiezeit, keine Vitalitätsbeurteilung möglich."
+    - "NMP: erhält Stoffwechsel bei physiologischer Temperatur, ermöglicht Vitalitätstestung, kann frühes Allotransplantatversagen reduzieren und Nutzung marginaler/DCD-Organe ermöglichen."
+    - "Evidenznuancen (z.B. reduzierter Transplantatschaden, erweiterter Spenderpool); belohnt Aktualität und sachliche Zurückhaltung."
 
 - id: P07_kidney_dysfunction_case
   domain: Clinical reasoning
@@ -95,6 +148,14 @@
     - "Differential: acute rejection (cellular/AMR), infection (BK nephropathy, CMV, UTI/pyelonephritis), CNI toxicity, obstruction/urological, dehydration/pre-renal, recurrence."
     - "Work-up: bloods incl. tacrolimus trough, urinalysis/culture, BK & CMV viral load, ultrasound +/- Doppler, then allograft biopsy."
     - "Sensible prioritisation reflecting the 3-month timeframe."
+  text_de: >
+    Ein nierentransplantierter Patient stellt sich 3 Monate nach der Transplantation mit
+    steigendem Kreatinin, leichtem Fieber und verminderter Urinausscheidung vor. Skizzieren
+    Sie Ihre Differentialdiagnose und das initiale diagnostische Vorgehen.
+  expected_key_points_de:
+    - "Differentialdiagnose: akute Abstossung (zellulär/AMR), Infektion (BK-Nephropathie, CMV, HWI/Pyelonephritis), CNI-Toxizität, Obstruktion/urologische Ursache, Dehydratation/prärenal, Rekurrenz."
+    - "Abklärung: Blutbild inkl. Tacrolimus-Talspiegel, Urinstatus/-kultur, BK- und CMV-Viruslast, Ultraschall +/- Doppler, dann Transplantatbiopsie."
+    - "Sinnvolle Priorisierung im 3-Monats-Zeitrahmen."
 
 - id: P08_consent_models
   domain: Ethics / law (Switzerland)
@@ -107,3 +168,11 @@
     - "Opt-in: donation only with explicit prior consent. Opt-out/presumed: donor unless one objected in life."
     - "Switzerland: 2022 referendum (~60% in favour) approved the 'extended' opt-out model; relatives retain a say."
     - "Implementation requires a national register/ordinances and was deferred (not immediate). Reward accurate nuance over confident wrong dates."
+  text_de: >
+    Erklären Sie den Unterschied zwischen Opt-in- (ausdrückliche Einwilligung) und
+    Opt-out- (mutmassliche Einwilligung) Modellen für die Organspende, und fassen Sie die
+    jüngste Änderung des Schweizer Einwilligungsmodells zusammen.
+  expected_key_points_de:
+    - "Opt-in: Spende nur mit ausdrücklicher Vorabeinwilligung. Opt-out/mutmassliche Einwilligung: Spender, sofern kein Widerspruch zu Lebzeiten."
+    - "Schweiz: Volksabstimmung 2022 (ca. 60% Ja-Stimmen) verabschiedete das 'erweiterte' Opt-out-Modell; Angehörige behalten ein Mitspracherecht."
+    - "Die Umsetzung erfordert ein nationales Register/Verordnungen und wurde aufgeschoben (nicht sofortige Einführung). Genaue Nuancen gegenüber falschen Datumsangaben werden belohnt."

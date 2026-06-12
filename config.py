@@ -113,6 +113,13 @@ CATEGORY_KEYS = list(CATEGORIES.keys())
 DEPLOYMENTS = ["local", "on-prem", "api"]
 
 # --------------------------------------------------------------------------- #
+# Languages
+# --------------------------------------------------------------------------- #
+LANGUAGES = {"en": "English", "de": "Deutsch"}
+LANGUAGE_KEYS = list(LANGUAGES.keys())
+LANGUAGE_DEFAULT = "en"
+
+# --------------------------------------------------------------------------- #
 # Workflow status
 # --------------------------------------------------------------------------- #
 STATUS_PENDING = "pending_review"
@@ -136,6 +143,7 @@ EVAL_COLUMNS = (
         "provider",
         "deployment",
         "prompt_id",
+        "language",
         "prompt_domain",
         "prompt_text",
         "llm_output",

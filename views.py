@@ -106,15 +106,24 @@ def page_add(store: EvalStore):
     # --- prompt selection --------------------------------------------------
     st.subheader("Prompt")
     prompts = load_prompts()
-    pid = st.selectbox(
+    pid_col, lang_col = st.columns([3, 1])
+    pid = pid_col.selectbox(
         "Use case",
         [p["id"] for p in prompts],
         format_func=lambda i: f"{i} — {prompt_by_id(i)['domain']}",
     )
+    language = lang_col.radio(
+        "Language",
+        C.LANGUAGE_KEYS,
+        format_func=lambda k: C.LANGUAGES[k],
+        horizontal=True,
+    )
     prompt = prompt_by_id(pid)
-    st.markdown(f"> {prompt['text'].strip()}")
+    text_key = "text_de" if language == "de" else "text"
+    kp_key = "expected_key_points_de" if language == "de" else "expected_key_points"
+    st.markdown(f"> {prompt[text_key].strip()}")
     with st.expander("Answer anchor (key points a strong answer should contain)"):
-        for kp in prompt.get("expected_key_points", []):
+        for kp in prompt.get(kp_key, []):
             st.markdown(f"- {kp}")
 
     # --- the scored entry --------------------------------------------------
@@ -164,8 +173,9 @@ def page_add(store: EvalStore):
             provider=provider,
             deployment=deployment,
             prompt_id=pid,
+            language=language,
             prompt_domain=prompt["domain"],
-            prompt_text=prompt["text"].strip(),
+            prompt_text=prompt[text_key].strip(),
             llm_output=llm_output.strip(),
             evaluator_name=evaluator_name.strip(),
             ev_safety=safety,
@@ -209,13 +219,16 @@ def page_review(store: EvalStore):
     row = store.get(eid)
 
     st.divider()
+    row_lang = row.get("language") or C.LANGUAGE_DEFAULT
+    lang_label = C.LANGUAGES.get(row_lang, row_lang.upper())
     st.markdown(f"**Model:** {row['model_name']} · **Category:** {row['category']} "
-                f"· **Prompt:** {row['prompt_id']} ({row['prompt_domain']})")
+                f"· **Prompt:** {row['prompt_id']} ({row['prompt_domain']}) · **Language:** {lang_label}")
     st.markdown(f"> {row['prompt_text']}")
     prompt = prompt_by_id(row["prompt_id"])
     if prompt:
+        kp_key = "expected_key_points_de" if row_lang == "de" else "expected_key_points"
         with st.expander("Answer anchor"):
-            for kp in prompt.get("expected_key_points", []):
+            for kp in prompt.get(kp_key, []):
                 st.markdown(f"- {kp}")
 
     st.subheader("Model output")
@@ -334,6 +347,70 @@ def page_results(store: EvalStore):
                    f"{n_prompts} prompts evaluated): "
                    + ", ".join(f"{r['model']} ({r['n_prompts']}/{n_prompts})"
                                for r in incomplete.to_dict("records")))
+
+    # language comparison
+    st.subheader("Language comparison (EN vs DE)")
+    has_lang_col = "language" in df.columns
+    has_de = has_lang_col and (df["language"] == "de").any()
+    has_en = has_lang_col and (df["language"].fillna("en") == "en").any()
+
+    if has_de and has_en:
+        df_en = df[df["language"].fillna("en") == "en"]
+        df_de = df[df["language"] == "de"]
+        ms_en = S.model_summary(df_en, verified_only=verified_only)
+        ms_de = S.model_summary(df_de, verified_only=verified_only)
+
+        cmp = ms[["model", "category", "mean_weighted"]].rename(
+            columns={"mean_weighted": "combined_mean"}
+        ).copy()
+        if not ms_en.empty:
+            cmp = cmp.merge(
+                ms_en[["model", "mean_weighted", "n_prompts"]].rename(
+                    columns={"mean_weighted": "en_mean", "n_prompts": "en_n_prompts"}),
+                on="model", how="left",
+            )
+        if not ms_de.empty:
+            cmp = cmp.merge(
+                ms_de[["model", "mean_weighted", "n_prompts"]].rename(
+                    columns={"mean_weighted": "de_mean", "n_prompts": "de_n_prompts"}),
+                on="model", how="left",
+            )
+        if "en_mean" in cmp.columns and "de_mean" in cmp.columns:
+            cmp["delta_en_minus_de"] = (cmp["en_mean"] - cmp["de_mean"]).round(3)
+
+        st.dataframe(cmp, width='stretch', hide_index=True)
+
+        try:
+            import plotly.express as px
+            import plotly.graph_objects as go
+
+            fig_lang = go.Figure()
+            fig_lang.add_trace(go.Bar(
+                name="English",
+                y=cmp["model"], x=cmp.get("en_mean"),
+                orientation="h", offsetgroup=0,
+            ))
+            fig_lang.add_trace(go.Bar(
+                name="Deutsch",
+                y=cmp["model"], x=cmp.get("de_mean"),
+                orientation="h", offsetgroup=1,
+            ))
+            fig_lang.update_layout(
+                barmode="group",
+                xaxis=dict(title="Mean weighted score", range=[0, C.SCALE_MAX]),
+                height=80 + 52 * len(cmp),
+                margin=dict(l=0, r=0, t=10, b=0),
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            )
+            st.plotly_chart(fig_lang, width='stretch')
+        except Exception:
+            pass
+    elif has_de and not has_en:
+        st.info("Only German evaluations so far — add English evaluations to enable the comparison.")
+    elif has_en and not has_de:
+        st.info("Only English evaluations so far — add German evaluations to enable the comparison.")
+    else:
+        st.info("Add evaluations in both languages to enable the comparison.")
 
     # detailed table
     st.subheader("Per-model detail")
