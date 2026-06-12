@@ -38,18 +38,25 @@ def _s(x) -> str:
     return str(x)
 
 
-_KP_STATUSES = ["—", "✅ Correct", "❌ Wrong", "○ Not covered"]
+_KP_STATUSES = ["✅ Correct", "❌ Wrong", "○ Not covered"]
 
 
 def _key_point_checklist(key_prefix: str, key_points: list) -> None:
-    """Render key points as a checklist with correct / wrong / not-covered radio buttons."""
+    """Render key points as a table with one row per statement and 3 rating options."""
+    if not key_points:
+        return
+    st.subheader("Answer anchor")
+    h_kp, h_opts = st.columns([5, 3])
+    h_kp.caption("Key point")
+    h_opts.caption("✅ Correct · ❌ Wrong · ○ Not covered")
     for i, kp in enumerate(key_points):
-        c_text, c_radio = st.columns([3, 2])
+        st.divider()
+        c_text, c_radio = st.columns([5, 3])
         c_text.markdown(kp)
         c_radio.radio(
             f"kp_{i}",
             _KP_STATUSES,
-            index=0,
+            index=None,
             key=f"{key_prefix}_kp_{i}",
             horizontal=True,
             label_visibility="collapsed",
@@ -139,14 +146,16 @@ def page_add(store: EvalStore):
     text_key = "text_de" if language == "de" else "text"
     kp_key = "expected_key_points_de" if language == "de" else "expected_key_points"
     st.markdown(f"> {prompt[text_key].strip()}")
-    with st.expander("Answer anchor (key points a strong answer should contain)"):
-        _key_point_checklist(f"{pid}_{language}", prompt.get(kp_key, []))
 
-    # --- the scored entry --------------------------------------------------
+    # --- model output (outside form so checklist can react alongside it) ---
+    st.subheader("Model output")
+    llm_output = st.text_area("Paste the model's full answer", height=220,
+                              key="add_llm_output")
+
+    _key_point_checklist(f"{pid}_{language}", prompt.get(kp_key, []))
+
+    # --- scores & submission -----------------------------------------------
     with st.form("add_form", clear_on_submit=False):
-        st.subheader("Model output")
-        llm_output = st.text_area("Paste the model's full answer", height=220)
-
         st.subheader("Scores")
         scores = {c["key"]: _score_select("add", c, None) for c in C.CRITERIA}
         safety = st.selectbox(
@@ -240,15 +249,14 @@ def page_review(store: EvalStore):
     st.markdown(f"**Model:** {row['model_name']} · **Category:** {row['category']} "
                 f"· **Prompt:** {row['prompt_id']} ({row['prompt_domain']}) · **Language:** {lang_label}")
     st.markdown(f"> {row['prompt_text']}")
-    prompt = prompt_by_id(row["prompt_id"])
-    if prompt:
-        kp_key = "expected_key_points_de" if row_lang == "de" else "expected_key_points"
-        with st.expander("Answer anchor"):
-            _key_point_checklist(f"rev_{eid}", prompt.get(kp_key, []))
-
     st.subheader("Model output")
     st.text_area("Model output", value=_s(row.get("llm_output")), height=220, disabled=True,
                  label_visibility="collapsed")
+
+    prompt = prompt_by_id(row["prompt_id"])
+    if prompt:
+        kp_key = "expected_key_points_de" if row_lang == "de" else "expected_key_points"
+        _key_point_checklist(f"rev_{eid}", prompt.get(kp_key, []))
 
     # evaluator's scores for reference
     ev_pretty = ", ".join(
