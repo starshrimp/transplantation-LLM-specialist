@@ -152,6 +152,8 @@ EVAL_COLUMNS = (
         "prompt_domain",
         "prompt_text",
         "llm_output",
+        "output_truncated",
+        "attempts",
         "evaluator_name",
     ]
     + _criteria_cols("ev")        # ev_factual, ev_completeness, ...

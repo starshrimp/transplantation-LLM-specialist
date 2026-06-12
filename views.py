@@ -48,7 +48,7 @@ def _key_point_checklist(key_prefix: str, key_points: list) -> None:
     st.subheader("Answer anchor")
     h_kp, h_opts = st.columns([5, 3])
     h_kp.caption("Key point")
-    h_opts.caption("✅ Correct · ❌ Wrong · ○ Not covered")
+    h_opts.caption("Select whether the model's answer covers this key point correctly, incorrectly, or not at all.")
     for i, kp in enumerate(key_points):
         st.divider()
         c_text, c_radio = st.columns([5, 3])
@@ -151,6 +151,16 @@ def page_add(store: EvalStore):
     st.subheader("Model output")
     llm_output = st.text_area("Paste the model's full answer", height=220,
                               key="add_llm_output")
+    c_trunc, c_att = st.columns([3, 2])
+    output_truncated = c_trunc.checkbox(
+        "Output was truncated / interrupted",
+        key="add_output_truncated",
+    )
+    attempts = c_att.number_input(
+        "Attempts until this answer",
+        min_value=1, value=1, step=1,
+        key="add_attempts",
+    )
 
     _key_point_checklist(f"{pid}_{language}", prompt.get(kp_key, []))
 
@@ -202,6 +212,8 @@ def page_add(store: EvalStore):
             prompt_domain=prompt["domain"],
             prompt_text=prompt[text_key].strip(),
             llm_output=llm_output.strip(),
+            output_truncated=output_truncated,
+            attempts=int(attempts),
             evaluator_name=evaluator_name.strip(),
             ev_safety=safety,
             ev_comment=comment.strip(),
@@ -252,6 +264,17 @@ def page_review(store: EvalStore):
     st.subheader("Model output")
     st.text_area("Model output", value=_s(row.get("llm_output")), height=220, disabled=True,
                  label_visibility="collapsed")
+    _flags = []
+    if str(row.get("output_truncated", "")).strip().lower() in ("true", "1", "yes"):
+        _flags.append("⚠️ Output was truncated / interrupted")
+    try:
+        _att = int(float(row.get("attempts", 1) or 1))
+        if _att > 1:
+            _flags.append(f"{_att} attempts needed")
+    except (TypeError, ValueError):
+        pass
+    if _flags:
+        st.caption(" · ".join(_flags))
 
     prompt = prompt_by_id(row["prompt_id"])
     if prompt:
