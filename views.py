@@ -39,17 +39,16 @@ def _s(x) -> str:
 
 
 def _score_select(label_prefix: str, crit: dict, default: int | None):
-    """A 1..5 selectbox for one criterion, with anchors shown as a caption."""
+    """A 0..3 selectbox for one criterion, with score labels shown inline."""
     anchors = crit["anchors"]
-    st.caption(f"**{crit['label']}** — {crit['help']}  \n"
-               f"`1` {anchors[1]}  ·  `3` {anchors[3]}  ·  `5` {anchors[5]}")
+    st.caption(f"**{crit['label']}** — {crit['help']}")
     opts = [None] + C.SCALE
     idx = opts.index(default) if default in opts else 0
     return st.selectbox(
         crit["label"],
         opts,
         index=idx,
-        format_func=lambda x: "—" if x is None else str(x),
+        format_func=lambda x, a=anchors: "—" if x is None else f"{x} — {a[x]}",
         key=f"{label_prefix}_{crit['key']}",
         label_visibility="collapsed",
     )

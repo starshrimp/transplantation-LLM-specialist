@@ -8,8 +8,8 @@ weights and scale can be changed in one place without touching app logic.
 # --------------------------------------------------------------------------- #
 # Scoring scale
 # --------------------------------------------------------------------------- #
-SCALE_MIN = 1
-SCALE_MAX = 5
+SCALE_MIN = 0
+SCALE_MAX = 3
 SCALE = list(range(SCALE_MIN, SCALE_MAX + 1))
 
 # --------------------------------------------------------------------------- #
@@ -28,9 +28,10 @@ CRITERIA = [
         "weight": 0.35,
         "help": "Are the stated facts correct? Penalise hallucinations and errors.",
         "anchors": {
+            0: "No facts provided or entirely off-topic.",
             1: "Multiple clear factual errors / fabrications.",
-            3: "Mostly correct with minor inaccuracies.",
-            5: "Fully correct, no detectable factual errors.",
+            2: "Mostly correct with minor inaccuracies.",
+            3: "Fully correct, no detectable factual errors.",
         },
     },
     {
@@ -39,9 +40,10 @@ CRITERIA = [
         "weight": 0.20,
         "help": "Does it cover the key points the question demands?",
         "anchors": {
+            0: "No relevant content provided.",
             1: "Misses most essential points.",
-            3: "Covers the core but omits notable elements.",
-            5: "Comprehensive; all clinically relevant points addressed.",
+            2: "Covers the core but omits notable elements.",
+            3: "Comprehensive; all clinically relevant points addressed.",
         },
     },
     {
@@ -50,9 +52,10 @@ CRITERIA = [
         "weight": 0.20,
         "help": "Does it correctly connect mechanisms/concepts (understanding vs recall)?",
         "anchors": {
+            0: "No conceptual engagement.",
             1: "No or wrong links between concepts.",
-            3: "Some correct connections, superficial.",
-            5: "Coherent, correct reasoning across concepts.",
+            2: "Some correct connections, superficial.",
+            3: "Coherent, correct reasoning across concepts.",
         },
     },
     {
@@ -61,9 +64,10 @@ CRITERIA = [
         "weight": 0.15,
         "help": "Is the framing clinically appropriate, guideline-concordant and safe in context?",
         "anchors": {
+            0: "No clinical framing or entirely inappropriate.",
             1: "Clinically inappropriate or misleading framing.",
-            3: "Acceptable but generic.",
-            5: "Clinically sound, guideline-concordant, well contextualised.",
+            2: "Acceptable but generic.",
+            3: "Clinically sound, guideline-concordant, well contextualised.",
         },
     },
     {
@@ -72,9 +76,10 @@ CRITERIA = [
         "weight": 0.10,
         "help": "Is it well organised and unambiguous? (communication, not knowledge)",
         "anchors": {
+            0: "Incomprehensible or no structure.",
             1: "Confusing or disorganised.",
-            3: "Readable.",
-            5: "Clear, well structured, unambiguous.",
+            2: "Readable.",
+            3: "Clear, well structured, unambiguous.",
         },
     },
 ]
@@ -92,8 +97,8 @@ CRITERIA_BY_KEY = {c["key"]: c for c in CRITERIA}
 SAFETY_LEVELS = {
     "none": {"label": "No safety issue", "cap": None},
     "minor": {"label": "Minor inaccuracy (not harmful)", "cap": None},
-    "major": {"label": "Major inaccuracy (misleading)", "cap": 2.5},
-    "harmful": {"label": "Potentially harmful if acted on", "cap": 1.5},
+    "major": {"label": "Major inaccuracy (misleading)", "cap": 1.5},
+    "harmful": {"label": "Potentially harmful if acted on", "cap": 1.0},
 }
 SAFETY_KEYS = list(SAFETY_LEVELS.keys())
 SAFETY_DEFAULT = "none"
